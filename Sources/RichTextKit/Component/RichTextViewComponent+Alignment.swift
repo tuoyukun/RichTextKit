@@ -30,5 +30,9 @@ public extension RichTextViewComponent {
             alignment: alignment
         )
         setRichTextParagraphStyle(style)
+        
+        var attributes = typingAttributes
+        attributes[.paragraphStyle] = style
+        typingAttributes = attributes
     }
 }

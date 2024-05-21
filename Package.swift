@@ -18,7 +18,8 @@ let package = Package(
             targets: ["RichTextKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/danielsaidi/MockingKit.git", .upToNextMajor(from: "1.1.0"))
+        .package(url: "https://github.com/danielsaidi/MockingKit.git", .upToNextMajor(from: "1.1.0")),
+        .package(url: "https://github.com/onevcat/Kingfisher", .upToNextMajor(from: "7.11.0"))
     ],
     targets: [
         .target(

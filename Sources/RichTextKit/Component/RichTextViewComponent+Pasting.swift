@@ -105,10 +105,10 @@ public extension RichTextViewComponent {
             moveInputCursor(to: index)
         }
         
-        self.performPasteWebImage(image, at: index)
+        let len = self.performPasteWebImage(image, at: index)
         
         if moveCursor {
-            moveInputCursor(to: safeInsertRange.location + 2)
+            moveInputCursor(to: safeInsertRange.location + len)
         }
         
         if moveCursor || isSelectedRange {
@@ -186,30 +186,45 @@ private extension RichTextViewComponent {
     func performPasteWebImage(
         _ image: WebImage,
         at index: Int
-    ) {
-        let newLine = NSAttributedString(string: "\n", attributes: richTextAttributes)
+    ) -> Int {
         let content = NSMutableAttributedString(attributedString: richText)
+        
+        //insert new lines
+        content.insert(
+            NSAttributedString(string: "\n\n\r", attributes: richTextAttributes),
+            at: index
+        )
         
         //make image attachment
         let textAttachment = NSTextAttachment()
         textAttachment.bounds = attachmentBounds(for: image.image)
-        
-        content.replaceCharacters(
-            in: NSRange(
-                location: index,
-                length: 0
-            ),
-            with: NSAttributedString(
-                attachment: textAttachment
-            ))
-        
         KF.url(URL(string: image.url))
             .set(
                 to: textAttachment,
                 attributedView: self.holdingView
             )
+        let attachmentString = NSAttributedString(attachment: textAttachment)
+        let result = NSMutableAttributedString(attributedString: attachmentString)
         
+        //center alignment
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        result.addAttributes(
+            [NSAttributedString.Key.paragraphStyle: paragraphStyle],
+            range: NSMakeRange(0, result.length)
+            )
+        
+        //insert image
+        content.replaceCharacters(
+            in: NSRange(
+                location: index + 1,
+                length: 0
+            ),
+            with: result
+        )
+    
         setRichText(content)
+        return result.length + 3
     }
 }
 #endif
